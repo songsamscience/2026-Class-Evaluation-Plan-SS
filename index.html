@@ -87,9 +87,12 @@
                         <div>
                             <label class="block text-sm font-bold text-gray-700 mb-2" for="gradeSelect">학년</label>
                             <select id="gradeSelect" class="w-full border border-gray-200 rounded-2xl px-4 py-3 focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all bg-gray-50/50 hover:bg-gray-50 cursor-pointer text-gray-700 font-medium">
-                                <option value="1">중학교 1학년 (22개정)</option>
-                                <option value="2">중학교 2학년 (22개정)</option>
-                                <option value="3">중학교 3학년 (15개정)</option>
+                                <option value="중학교_1">중학교 1학년 (22개정)</option>
+                                <option value="중학교_2">중학교 2학년 (22개정)</option>
+                                <option value="중학교_3">중학교 3학년 (15개정)</option>
+                                <option value="고등학교_1">고등학교 1학년 (22개정)</option>
+                                <option value="고등학교_2">고등학교 2학년 (22개정)</option>
+                                <option value="고등학교_3">고등학교 3학년 (15개정)</option>
                             </select>
                         </div>
 
@@ -328,7 +331,7 @@
         const addTaskBtn = document.getElementById('addTaskBtn');
 
         // State
-        let currentGrade = '1';
+        let currentGrade = '중학교_1'; // 초기값 업데이트
         let currentSemester = '1';
         let currentSubject = '과학 (물질의 상태 변화)';
         let is15Revision = false; // 3학년(15개정) 체크용
@@ -343,6 +346,9 @@
 
         // Generate Template Function
         function generateTemplate() {
+            // "중학교_1" -> schoolLevel: "중학교", gradeNum: "1"
+            const [schoolLevel, gradeNum] = currentGrade.split('_');
+
             // 3학년일 경우 15개정, 그 외는 22개정으로 텍스트 일부 변경
             const revisionText = is15Revision ? "2015 개정" : "2022 개정";
             
@@ -351,11 +357,11 @@
             const subjectOnly = currentSubject.split('(')[0].trim() || currentSubject;
 
             let promptStr = `# Name
-중학교 ${currentGrade}학년 ${currentSemester}학기 ${subjectOnly} 교수학습 평가계획
+${schoolLevel} ${gradeNum}학년 ${currentSemester}학기 ${subjectOnly} 교수학습 평가계획
 
 # Role
-당신은 20년 이상의 경력을 가진 베테랑 중학교 교사이자, 과정중심평가 및 ${revisionText} 교육과정 전문 컨설턴트입니다. 
-지금부터 ${revisionText} 교육과정 성취기준에 기반하여 **[중학교 ${currentGrade}학년 ${currentSemester}학기 ${currentSubject}]** 과목에 대한 4가지 파트로 구성된 완벽한 마크다운 표 형태의 계획서를 작성해 주십시오.
+당신은 20년 이상의 경력을 가진 베테랑 ${schoolLevel} 교사이자, 과정중심평가 및 ${revisionText} 교육과정 전문 컨설턴트입니다. 
+지금부터 ${revisionText} 교육과정 성취기준에 기반하여 **[${schoolLevel} ${gradeNum}학년 ${currentSemester}학기 ${currentSubject}]** 과목에 대한 4가지 파트로 구성된 완벽한 마크다운 표 형태의 계획서를 작성해 주십시오.
 
 # Core Guidelines
 ## 1. 평가 비율 및 구성 (2026 중등 학생평가 내실화 계획 엄수)
@@ -380,7 +386,7 @@
 # Output Format
 반드시 아래의 마크다운 표 양식을 엄격히 준수하여 출력하십시오.
 
-### 1. [${currentGrade}학년 ${currentSemester}학기 ${currentSubject}] 교수·학습 운영 계획
+### 1. [${schoolLevel} ${gradeNum}학년 ${currentSemester}학기 ${currentSubject}] 교수·학습 운영 계획
 | 월 | 주 | 주제/단원명 | 핵심 아이디어 및 성취기준 | 교수·학습 내용(수업방법) | 평가 및 피드백 방법 | 비고(안전/생태 등) |
 |---|---|---|---|---|---|---|
 | | | | | | | |
@@ -420,7 +426,7 @@
 
             promptStr += `
 # Action
-위 지침과 출력 양식을 완벽히 준수하여, 즉시 **[중학교 ${currentGrade}학년 ${currentSemester}학기 ${currentSubject}]** 교수학습 및 평가 운영 계획서를 작성해 주세요.`;
+위 지침과 출력 양식을 완벽히 준수하여, 즉시 **[${schoolLevel} ${gradeNum}학년 ${currentSemester}학기 ${currentSubject}]** 교수학습 및 평가 운영 계획서를 작성해 주세요.`;
 
             return promptStr;
         }
@@ -433,8 +439,9 @@
         // Event Listeners for inputs
         gradeSelect.addEventListener('change', (e) => {
             currentGrade = e.target.value;
+            const [schoolLevel, gradeNum] = currentGrade.split('_');
             // 3학년 선택 시 15개정 플래그 켜기
-            is15Revision = (currentGrade === '3');
+            is15Revision = (gradeNum === '3');
             updatePreview();
         });
 
